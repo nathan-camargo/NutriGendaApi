@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using NutriGendaApi.Data;
-using NutriGendaApi.Services;
+using NutriGendaApi.src.Data;
+using NutriGendaApi.src.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

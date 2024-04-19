@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.Services;
+using NutriGendaApi.src.Services;
 
-namespace NutriGendaApi.Controllers
+namespace NutriGendaApi.src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
