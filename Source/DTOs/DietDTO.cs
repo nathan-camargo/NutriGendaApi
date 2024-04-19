@@ -1,4 +1,4 @@
-﻿namespace NutriGendaApi.DTOs
+﻿namespace NutriGendaApi.src.DTOs
 {
     public class DietDTO
     {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace NutriGendaApi.Data
+namespace NutriGendaApi.src.Data
 {
     public class AppDbContext : DbContext
     {

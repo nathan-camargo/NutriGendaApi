@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NutriGendaApi.Data;
+using NutriGendaApi.src.Data;
 
-namespace NutriGendaApi.Services
+namespace NutriGendaApi.src.Services
 {
     public class DietService
     {
