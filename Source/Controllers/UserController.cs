@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.src.Services;
+using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.Services;
+using System;
+using System.Threading.Tasks;
 
-namespace NutriGendaApi.src.Controllers
+namespace NutriGendaApi.Source.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -17,7 +20,7 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Retorna todos os usuários cadastrados.
         /// </summary>
-        /// <returns>Uma lista de usuários.</returns>
+        /// <returns>Uma lista de DTOs de usuários.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -29,7 +32,7 @@ namespace NutriGendaApi.src.Controllers
         /// Retorna um usuário específico pelo ID.
         /// </summary>
         /// <param name="id">O ID do usuário.</param>
-        /// <returns>O usuário encontrado ou NotFound se não existir.</returns>
+        /// <returns>O DTO do usuário encontrado ou NotFound se não existir.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
@@ -42,12 +45,12 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Cria um novo usuário.
         /// </summary>
-        /// <param name="user">Dados do usuário a ser criado.</param>
-        /// <returns>O usuário criado.</returns>
+        /// <param name="userDto">DTO do usuário a ser criado.</param>
+        /// <returns>O DTO do usuário criado.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] UserDTO userDto)
         {
-            var createdUser = await _userService.CreateUser(user);
+            var createdUser = await _userService.CreateUser(userDto);
             return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
         }
 
@@ -55,19 +58,19 @@ namespace NutriGendaApi.src.Controllers
         /// Atualiza um usuário existente.
         /// </summary>
         /// <param name="id">O ID do usuário a ser atualizado.</param>
-        /// <param name="user">Dados atualizados do usuário.</param>
+        /// <param name="userDto">DTO com dados atualizados do usuário.</param>
         /// <returns>NoContent se a atualização for bem-sucedida, NotFound se não encontrado.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDTO userDto)
         {
-            if (id != user.Id)
+            if (id != userDto.Id)
                 return BadRequest("ID mismatch");
 
             var existingUser = await _userService.GetUserById(id);
             if (existingUser == null)
                 return NotFound();
 
-            await _userService.UpdateUser(user);
+            await _userService.UpdateUser(userDto);
             return NoContent();
         }
 
@@ -79,11 +82,10 @@ namespace NutriGendaApi.src.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var user = await _userService.GetUserById(id);
-            if (user == null)
+            var success = await _userService.DeleteUser(id);
+            if (!success)
                 return NotFound();
 
-            await _userService.DeleteUser(id);
             return NoContent();
         }
 
@@ -91,7 +93,7 @@ namespace NutriGendaApi.src.Controllers
         /// Busca um usuário pelo email.
         /// </summary>
         /// <param name="email">Email do usuário a ser encontrado.</param>
-        /// <returns>O usuário encontrado ou NotFound se não existir.</returns>
+        /// <returns>O DTO do usuário encontrado ou NotFound se não existir.</returns>
         [HttpGet("byemail/{email}")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
