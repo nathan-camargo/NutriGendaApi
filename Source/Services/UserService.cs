@@ -1,53 +1,68 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NutriGendaApi.src.Data;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using NutriGendaApi.Source.Data;
+using NutriGendaApi.Source.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace NutriGendaApi.src.Services
+namespace NutriGendaApi.Source.Services
 {
     public class UserService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Cria um novo usuário.
         /// </summary>
-        /// <param name="user">Dados do usuário a ser criado.</param>
-        /// <returns>O usuário criado com ID.</returns>
-        public async Task<User> CreateUser(User user)
+        /// <param name="userDto">DTO do usuário a ser criado.</param>
+        /// <returns>DTO do usuário criado com ID.</returns>
+        public async Task<UserDTO> CreateUser(UserDTO userDto)
         {
+            var user = _mapper.Map<User>(userDto);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return user;
+            return _mapper.Map<UserDTO>(user);
         }
 
         /// <summary>
         /// Busca um usuário pelo ID.
         /// </summary>
         /// <param name="id">ID do usuário.</param>
-        /// <returns>O usuário encontrado ou null se não existir.</returns>
-        public async Task<User> GetUserById(Guid id)
+        /// <returns>DTO do usuário encontrado ou null se não existir.</returns>
+        public async Task<UserDTO> GetUserById(Guid id)
         {
-            return await _context.Users
-                                 .Include(u => u.Nutritionist)
-                                 .Include(u => u.HealthProfile)
-                                 .Include(u => u.Diets)
-                                 .FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users
+                                     .Include(u => u.Nutritionist)
+                                     .Include(u => u.HealthProfile)
+                                     .Include(u => u.Diets)
+                                     .FirstOrDefaultAsync(u => u.Id == id);
+            return _mapper.Map<UserDTO>(user);
         }
 
         /// <summary>
         /// Atualiza um usuário existente.
         /// </summary>
-        /// <param name="user">Dados atualizados do usuário.</param>
-        /// <returns>O usuário atualizado.</returns>
-        public async Task<User> UpdateUser(User user)
+        /// <param name="userDto">DTO do usuário com dados atualizados.</param>
+        /// <returns>DTO do usuário atualizado.</returns>
+        public async Task<UserDTO> UpdateUser(UserDTO userDto)
         {
+            var user = await _context.Users.FindAsync(userDto.Id);
+            if (user == null)
+            {
+                return null;
+            }
+            _mapper.Map(userDto, user);
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return user;
+            return _mapper.Map<UserDTO>(user);
         }
 
         /// <summary>
@@ -62,7 +77,6 @@ namespace NutriGendaApi.src.Services
             {
                 return false;
             }
-
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return true;
@@ -72,27 +86,29 @@ namespace NutriGendaApi.src.Services
         /// Busca um usuário pelo email.
         /// </summary>
         /// <param name="email">Email do usuário a ser encontrado.</param>
-        /// <returns>O usuário encontrado ou null se não existir.</returns>
-        public async Task<User> GetUserByEmail(string email)
+        /// <returns>DTO do usuário encontrado ou null se não existir.</returns>
+        public async Task<UserDTO> GetUserByEmail(string email)
         {
-            return await _context.Users
-                                 .Include(u => u.Nutritionist)
-                                 .Include(u => u.HealthProfile)
-                                 .Include(u => u.Diets)
-                                 .FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users
+                                     .Include(u => u.Nutritionist)
+                                     .Include(u => u.HealthProfile)
+                                     .Include(u => u.Diets)
+                                     .FirstOrDefaultAsync(u => u.Email == email);
+            return _mapper.Map<UserDTO>(user);
         }
 
         /// <summary>
         /// Lista todos os usuários registrados.
         /// </summary>
-        /// <returns>Lista de todos os usuários.</returns>
-        public async Task<List<User>> GetAllUsers()
+        /// <returns>Lista de DTOs de todos os usuários.</returns>
+        public async Task<List<UserDTO>> GetAllUsers()
         {
-            return await _context.Users
-                                 .Include(u => u.Nutritionist)
-                                 .Include(u => u.HealthProfile)
-                                 .Include(u => u.Diets)
-                                 .ToListAsync();
+            var users = await _context.Users
+                                      .Include(u => u.Nutritionist)
+                                      .Include(u => u.HealthProfile)
+                                      .Include(u => u.Diets)
+                                      .ToListAsync();
+            return _mapper.Map<List<UserDTO>>(users);
         }
     }
 }

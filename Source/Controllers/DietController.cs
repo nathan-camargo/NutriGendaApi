@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.src.Services;
+using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.Services;
+using System;
+using System.Threading.Tasks;
 
-namespace NutriGendaApi.src.Controllers
+namespace NutriGendaApi.Source.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -17,7 +20,7 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Retorna todas as dietas cadastradas.
         /// </summary>
-        /// <returns>Uma lista de dietas.</returns>
+        /// <returns>Uma lista de DTOs de dietas.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllDiets()
         {
@@ -29,7 +32,7 @@ namespace NutriGendaApi.src.Controllers
         /// Retorna uma dieta específica pelo ID.
         /// </summary>
         /// <param name="id">O ID da dieta.</param>
-        /// <returns>A dieta correspondente ou NotFound se não encontrada.</returns>
+        /// <returns>O DTO da dieta correspondente ou NotFound se não encontrada.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDietById(Guid id)
         {
@@ -42,12 +45,12 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Cria uma nova dieta.
         /// </summary>
-        /// <param name="diet">O objeto Diet para criar.</param>
-        /// <returns>A dieta criada.</returns>
+        /// <param name="dietDto">O DTO da dieta a ser criada.</param>
+        /// <returns>O DTO da dieta criada.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateDiet([FromBody] Diet diet)
+        public async Task<IActionResult> CreateDiet([FromBody] DietDTO dietDto)
         {
-            var createdDiet = await _dietService.CreateDiet(diet);
+            var createdDiet = await _dietService.CreateDiet(dietDto);
             return CreatedAtAction(nameof(GetDietById), new { id = createdDiet.Id }, createdDiet);
         }
 
@@ -55,19 +58,19 @@ namespace NutriGendaApi.src.Controllers
         /// Atualiza uma dieta existente.
         /// </summary>
         /// <param name="id">O ID da dieta a ser atualizada.</param>
-        /// <param name="diet">Os novos dados para a dieta.</param>
+        /// <param name="dietDto">O DTO com os novos dados para a dieta.</param>
         /// <returns>NoContent se a atualização foi bem-sucedida, NotFound se a dieta não foi encontrada.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDiet(Guid id, [FromBody] Diet diet)
+        public async Task<IActionResult> UpdateDiet(Guid id, [FromBody] DietDTO dietDto)
         {
-            if (id != diet.Id)
+            if (id != dietDto.Id)
                 return BadRequest("ID mismatch");
 
             var existingDiet = await _dietService.GetDietById(id);
             if (existingDiet == null)
                 return NotFound();
 
-            await _dietService.UpdateDiet(diet);
+            await _dietService.UpdateDiet(dietDto);
             return NoContent();
         }
 
@@ -79,11 +82,10 @@ namespace NutriGendaApi.src.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDiet(Guid id)
         {
-            var diet = await _dietService.GetDietById(id);
-            if (diet == null)
+            var success = await _dietService.DeleteDiet(id);
+            if (!success)
                 return NotFound();
 
-            await _dietService.DeleteDiet(id);
             return NoContent();
         }
 
@@ -91,7 +93,7 @@ namespace NutriGendaApi.src.Controllers
         /// Retorna as dietas de um usuário específico.
         /// </summary>
         /// <param name="userId">O ID do usuário.</param>
-        /// <returns>Uma lista de dietas do usuário.</returns>
+        /// <returns>Uma lista de DTOs de dietas do usuário.</returns>
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetDietsByUserId(Guid userId)
         {

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.src.Services;
+using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.Services;
+using System;
+using System.Threading.Tasks;
 
-namespace NutriGendaApi.src.Controllers
+namespace NutriGendaApi.Source.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -17,7 +20,7 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Retorna todos os nutricionistas cadastrados.
         /// </summary>
-        /// <returns>Uma lista de nutricionistas.</returns>
+        /// <returns>Uma lista de DTOs de nutricionistas.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllNutritionists()
         {
@@ -29,7 +32,7 @@ namespace NutriGendaApi.src.Controllers
         /// Retorna um nutricionista específico pelo ID.
         /// </summary>
         /// <param name="id">O ID do nutricionista.</param>
-        /// <returns>O nutricionista encontrado ou NotFound se não existir.</returns>
+        /// <returns>O DTO do nutricionista encontrado ou NotFound se não existir.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetNutritionistById(Guid id)
         {
@@ -42,12 +45,12 @@ namespace NutriGendaApi.src.Controllers
         /// <summary>
         /// Cria um novo nutricionista.
         /// </summary>
-        /// <param name="nutritionist">Dados do nutricionista a ser criado.</param>
-        /// <returns>O nutricionista criado.</returns>
+        /// <param name="nutritionistDto">DTO do nutricionista a ser criado.</param>
+        /// <returns>O DTO do nutricionista criado.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateNutritionist([FromBody] Nutritionist nutritionist)
+        public async Task<IActionResult> CreateNutritionist([FromBody] NutritionistDTO nutritionistDto)
         {
-            var createdNutritionist = await _nutritionistService.CreateNutritionist(nutritionist);
+            var createdNutritionist = await _nutritionistService.CreateNutritionist(nutritionistDto);
             return CreatedAtAction(nameof(GetNutritionistById), new { id = createdNutritionist.Id }, createdNutritionist);
         }
 
@@ -55,19 +58,19 @@ namespace NutriGendaApi.src.Controllers
         /// Atualiza um nutricionista existente.
         /// </summary>
         /// <param name="id">O ID do nutricionista a ser atualizado.</param>
-        /// <param name="nutritionist">Dados atualizados do nutricionista.</param>
+        /// <param name="nutritionistDto">DTO com dados atualizados do nutricionista.</param>
         /// <returns>NoContent se a atualização for bem-sucedida, NotFound se não encontrado.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNutritionist(Guid id, [FromBody] Nutritionist nutritionist)
+        public async Task<IActionResult> UpdateNutritionist(Guid id, [FromBody] NutritionistDTO nutritionistDto)
         {
-            if (id != nutritionist.Id)
+            if (id != nutritionistDto.Id)
                 return BadRequest("ID mismatch");
 
             var existingNutritionist = await _nutritionistService.GetNutritionistById(id);
             if (existingNutritionist == null)
                 return NotFound();
 
-            await _nutritionistService.UpdateNutritionist(nutritionist);
+            await _nutritionistService.UpdateNutritionist(nutritionistDto);
             return NoContent();
         }
 
@@ -79,11 +82,10 @@ namespace NutriGendaApi.src.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNutritionist(Guid id)
         {
-            var nutritionist = await _nutritionistService.GetNutritionistById(id);
-            if (nutritionist == null)
+            var success = await _nutritionistService.DeleteNutritionist(id);
+            if (!success)
                 return NotFound();
 
-            await _nutritionistService.DeleteNutritionist(id);
             return NoContent();
         }
     }
