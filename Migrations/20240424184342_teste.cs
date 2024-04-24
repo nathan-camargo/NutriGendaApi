@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NutriGendaApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class teste : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace NutriGendaApi.Migrations
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Name = table.Column<string>(type: "varchar(255)", nullable: false),
                     Email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
-                    Password = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Password = table.Column<string>(type: "varchar(255)", nullable: false),
+                    Crn = table.Column<string>(type: "varchar(255)", nullable: false)
                 },
                 constraints: table =>
                 {

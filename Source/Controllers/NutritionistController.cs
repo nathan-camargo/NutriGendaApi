@@ -17,6 +17,20 @@ namespace NutriGendaApi.Source.Controllers
             _nutritionistService = nutritionistService;
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] NutritionistDTO nutritionistDto)
+        {
+            var user = await _nutritionistService.Authenticate(nutritionistDto.Email, nutritionistDto.Password);
+            if (user != null)
+            {
+                return Ok(new { token = "token_simulado_aqui" });
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         /// <summary>
         /// Retorna todos os nutricionistas cadastrados.
         /// </summary>

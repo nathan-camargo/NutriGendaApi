@@ -10,11 +10,14 @@ public class Nutritionist
 
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public  string Name { get; set; }
+    public string Name { get; set; }
 
     [Column(TypeName = "varchar(255)")]
-    public  string Email { get; set; }
+    public string Email { get; set; }
 
     [Column(TypeName = "varchar(255)")]
-    public  string Password { get; set; }
+    public string Password { get; set; }
+
+    [Column(TypeName = "varchar(255)")]
+    public string Crn { get; set; }
 }
