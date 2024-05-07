@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.Models;
 
 namespace NutriGendaApi.Source.Services
 {

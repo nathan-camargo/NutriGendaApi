@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NutriGendaApi.Source.DTOs;
 using NutriGendaApi.Source.Services;
-using System;
-using System.Threading.Tasks;
+
 
 namespace NutriGendaApi.Source.Controllers
 {
@@ -15,6 +14,21 @@ namespace NutriGendaApi.Source.Controllers
         public NutritionistController(NutritionistService nutritionistService)
         {
             _nutritionistService = nutritionistService;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] NutritionistDTO nutritionistDto)
+        {
+            var user = await _nutritionistService.Authenticate(nutritionistDto.Email, nutritionistDto.Password);
+            if (user != null)
+            {
+                var token = _nutritionistService.GenerateJwtToken(user);
+                return Ok(new { token = token });
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         /// <summary>

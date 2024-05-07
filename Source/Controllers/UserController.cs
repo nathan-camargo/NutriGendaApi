@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NutriGendaApi.Source.DTOs;
 using NutriGendaApi.Source.Services;
-using System;
-using System.Threading.Tasks;
+
 
 namespace NutriGendaApi.Source.Controllers
 {

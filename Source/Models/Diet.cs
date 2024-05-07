@@ -1,21 +1,20 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Diets")]
-public class Diet
+namespace NutriGendaApi.Source.Models
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
+    [Table("Diets")]
+    public class Diet
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
-    [ForeignKey("User")]
-    public Guid UserId { get; set; }
-    public User? User { get; set; }
+        [ForeignKey("User")]
+        public Guid UserId { get; set; }
+        public User? User { get; set; }
 
-    [Required]
-    public int Week { get; set; }
+        public virtual ICollection<Week> Weeks { get; set; } = new List<Week>();
+    }
 
-    [Required]
-    [Column(TypeName = "text")]
-    public string? Information { get; set; }
 }

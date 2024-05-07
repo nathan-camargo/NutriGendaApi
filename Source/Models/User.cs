@@ -1,3 +1,4 @@
+using NutriGendaApi.Source.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +16,9 @@ public class User
     [Required]
     [Column(TypeName = "varchar(255)")]
     public string Password { get; set; }
+
+    [Column(TypeName = "varchar(255)")]
+    public string PasswordHash { get; set; }
 
     [Required]
     [Column(TypeName = "varchar(255)")]
