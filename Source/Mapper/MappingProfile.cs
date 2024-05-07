@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.Models;
 
 namespace NutriGendaApi.Source.Mapper
 {
@@ -18,7 +19,7 @@ namespace NutriGendaApi.Source.Mapper
             // Mapeamentos para Nutritionist
             CreateMap<Nutritionist, NutritionistDTO>()
                 .ReverseMap();
-
+            
             // Mapeamentos para User
             CreateMap<User, UserDTO>()
                 .ReverseMap();

@@ -19,5 +19,8 @@ public class Nutritionist
     public string Password { get; set; }
 
     [Column(TypeName = "varchar(255)")]
+    public string PasswordHash { get; set; }
+
+    [Column(TypeName = "varchar(255)")]
     public string Crn { get; set; }
 }

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NutriGendaApi.Source.DTOs;
 using NutriGendaApi.Source.Services;
-using System;
-using System.Threading.Tasks;
+
 
 namespace NutriGendaApi.Source.Controllers
 {
@@ -23,7 +22,8 @@ namespace NutriGendaApi.Source.Controllers
             var user = await _nutritionistService.Authenticate(nutritionistDto.Email, nutritionistDto.Password);
             if (user != null)
             {
-                return Ok(new { token = "token_simulado_aqui" });
+                var token = _nutritionistService.GenerateJwtToken(user);
+                return Ok(new { token = token });
             }
             else
             {

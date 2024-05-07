@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.DTOs;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace NutriGendaApi.Source.Services
 {
@@ -83,6 +87,45 @@ namespace NutriGendaApi.Source.Services
         {
             var nutritionists = await _context.Nutritionists.ToListAsync();
             return _mapper.Map<List<NutritionistDTO>>(nutritionists);
+        }
+
+        /// <summary>
+        /// Autentica um nutricionista usando e-mail e senha.
+        /// </summary>
+        /// <param name="email">E-mail do nutricionista.</param>
+        /// <param name="password">Senha do nutricionista.</param>
+        /// <returns>O DTO do nutricionista autenticado ou null se a autenticação falhar.</returns>
+        public async Task<NutritionistDTO?> Authenticate(string email, string password)
+        {
+            var nutritionist = await _context.Nutritionists
+                                             .SingleOrDefaultAsync(n => n.Email == email);
+
+            if (nutritionist != null && BCrypt.Net.BCrypt.Verify(password, nutritionist.PasswordHash))
+            {
+                return _mapper.Map<NutritionistDTO>(nutritionist);
+            }
+
+            return null;
+        }
+
+        public string GenerateJwtToken(NutritionistDTO nutritionist)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_key_here"));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, nutritionist.Email),
+            new Claim("Id", nutritionist.Id.ToString())
+        };
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddHours(3),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
