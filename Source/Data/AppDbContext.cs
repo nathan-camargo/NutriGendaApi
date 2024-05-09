@@ -9,7 +9,6 @@ namespace NutriGendaApi.Source.Data
         public DbSet<HealthProfile> HealthProfiles { get; set; }
         public DbSet<Diet> Diets { get; set; }
         public DbSet<Nutritionist> Nutritionists { get; set; }
-        public DbSet<Week> Weeks { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<FoodItem> FoodItems { get; set; }
 
@@ -19,9 +18,9 @@ namespace NutriGendaApi.Source.Data
         {
             // User and Nutritionist Relationship
             modelBuilder.Entity<User>()
-                .HasOne<Nutritionist>()
+                .HasOne(u => u.Nutritionist)
                 .WithMany()
-                .HasForeignKey(u => u.NutritionistToken)
+                .HasForeignKey(u => u.NutritionistId)
                 .HasPrincipalKey(n => n.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -37,20 +36,13 @@ namespace NutriGendaApi.Source.Data
                 .HasOne(d => d.User) 
                 .WithMany(u => u.Diets) 
                 .HasForeignKey(d => d.UserId) 
-                .OnDelete(DeleteBehavior.Cascade); 
-
-            // Week to Diet Relationship
-            modelBuilder.Entity<Week>()
-                .HasOne(w => w.Diet)
-                .WithMany(d => d.Weeks)
-                .HasForeignKey(w => w.DietId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Meal to Week Relationship
+            // Meal to Diet Relationship
             modelBuilder.Entity<Meal>()
-                .HasOne(m => m.Week)
-                .WithMany(w => w.Meals)
-                .HasForeignKey(m => m.WeekId)
+                .HasOne(d => d.Diet)
+                .WithMany(u => u.Meals)
+                .HasForeignKey(d => d.DietId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // FoodItem to Meal Relationship

@@ -13,8 +13,40 @@ namespace NutriGendaApi.Source.Models
         [ForeignKey("User")]
         public Guid UserId { get; set; }
         public User? User { get; set; }
+        public virtual ICollection<Meal> Meals { get; set; } = new List<Meal>();
+    }
 
-        public virtual ICollection<Week> Weeks { get; set; } = new List<Week>();
+    [Table("Meals")]
+    public class Meal
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        public virtual ICollection<FoodItem> FoodItems { get; set; } = new List<FoodItem>();
+
+        public Guid DietId { get; set; }
+        public Diet Diet { get; set; }
+    }
+
+    [Table("FoodItems")]
+    public class FoodItem
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
+        [Required]
+        public string Name { get; set; } // Name of the food like "Egg", "Milk", etc.
+
+        public string Description { get; set; } // Description or quantity like "2 eggs", "200ml of milk"
+
+        [ForeignKey("Meal")]
+        public Guid MealId { get; set; }
+        public Meal Meal { get; set; }
     }
 
 }

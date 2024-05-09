@@ -13,8 +13,7 @@ public class User
     [Column(TypeName = "varchar(255)")]
     public string Email { get; set; }
 
-    [Required]
-    [Column(TypeName = "varchar(255)")]
+    [NotMapped]
     public string Password { get; set; }
 
     [Column(TypeName = "varchar(255)")]
@@ -22,8 +21,7 @@ public class User
 
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public Guid NutritionistToken { get; set; }
-
+    public Guid NutritionistId { get; set; }
 
     public virtual Nutritionist Nutritionist { get; set; }
     public virtual HealthProfile HealthProfile { get; set; }

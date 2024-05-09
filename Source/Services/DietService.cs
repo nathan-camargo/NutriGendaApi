@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NutriGendaApi.Source.Data;
-using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.DTOs.Diet;
 using NutriGendaApi.Source.Models;
 
 namespace NutriGendaApi.Source.Services
@@ -95,6 +95,55 @@ namespace NutriGendaApi.Source.Services
         {
             var diets = await _context.Diets.Where(d => d.UserId == userId).ToListAsync();
             return _mapper.Map<List<DietDTO>>(diets);
+        }
+    }
+
+    public class MealService
+    {
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
+
+        public MealService(AppDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<MealDTO?> GetMealById(Guid mealId)
+        {
+            var meal = await _context.Meals
+                .Include(m => m.FoodItems)
+                .SingleOrDefaultAsync(m => m.Id == mealId);
+            return meal == null ? null : _mapper.Map<MealDTO>(meal);
+        }
+
+        public async Task<MealDTO> CreateMeal(MealDTO mealDto)
+        {
+            var meal = _mapper.Map<Meal>(mealDto);
+            _context.Meals.Add(meal);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<MealDTO>(meal);
+        }
+
+        public async Task<MealDTO?> UpdateMeal(Guid mealId, MealDTO mealDto)
+        {
+            var meal = await _context.Meals.FindAsync(mealId);
+            if (meal == null) return null;
+
+            _mapper.Map(mealDto, meal);
+            _context.Entry(meal).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return _mapper.Map<MealDTO>(meal);
+        }
+
+        public async Task<bool> DeleteMeal(Guid mealId)
+        {
+            var meal = await _context.Meals.FindAsync(mealId);
+            if (meal == null) return false;
+
+            _context.Meals.Remove(meal);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
