@@ -24,6 +24,5 @@ public class User
     public Guid NutritionistId { get; set; }
 
     public virtual Nutritionist Nutritionist { get; set; }
-    public virtual HealthProfile HealthProfile { get; set; }
     public virtual ICollection<Diet> Diets { get; set; } = new List<Diet>();
 }

@@ -1,4 +1,5 @@
 ﻿using NutriGendaApi.Source.Data;
+using NutriGendaApi.Source.Models;
 
 namespace NutriGendaApi
 {
@@ -6,32 +7,73 @@ namespace NutriGendaApi
     {
         public static void Initialize(AppDbContext context)
         {
-            // Garante que o banco de dados foi criado
             context.Database.EnsureCreated();
 
-            // Verifica se já existem nutricionistas no banco de dados
-            if (context.Nutritionists.Any())
+            // Verifica se já existem nutricionistas cadastrados
+            if (!context.Nutritionists.Any())
             {
-                return;   // DB já foi inicializado
-            }
+                var nutritionist = new Nutritionist
+                {
+                    Name = "Dr. John Doe",
+                    Email = "john.doe@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("12345"),
+                    Crn = "CRN123456"
+                };
 
-            // Cria um novo nutricionista
-            var nutritionists = new Nutritionist[]
-            {
-            new Nutritionist
-            {
-                Name = "Dr. John Doe",
-                Email = "john.doe@example.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("12345"), // Utilize um hash real aqui
-                Crn = "CRN123456"
-            }
-            };
+                context.Nutritionists.Add(nutritionist);
+                context.SaveChanges();
 
-            foreach (Nutritionist n in nutritionists)
-            {
-                context.Nutritionists.Add(n);
+                // Cria um usuário associado ao nutricionista
+                var user = new User
+                {
+                    Email = "user@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("user123"),
+                    NutritionistId = nutritionist.Id
+                };
+
+                context.Users.Add(user);
+                context.SaveChanges();
+
+                // Cria uma dieta associada ao usuário
+                var diet = new Diet
+                {
+                    UserId = user.Id
+                };
+
+                context.Diets.Add(diet);
+                context.SaveChanges();
+
+                // Cria refeições associadas à dieta
+                var mealNames = new string[] { "Café da Manhã", "Lanche", "Almoço", "Lanche da Tarde", "Jantar" };
+                foreach (var mealName in mealNames)
+                {
+                    var meal = new Meal
+                    {
+                        Name = mealName,
+                        DietId = diet.Id
+                    };
+
+                    context.Meals.Add(meal);
+                }
+                context.SaveChanges();
+
+                // Adiciona alguns alimentos às refeições
+                var meals = context.Meals.ToList();
+                foreach (var meal in meals)
+                {
+                    var foodItems = new FoodItem[]
+                    {
+                        new FoodItem { Name = "Pão", Description = "2 fatias", MealId = meal.Id },
+                        new FoodItem { Name = "Leite", Description = "1 copo", MealId = meal.Id }
+                    };
+
+                    foreach (var item in foodItems)
+                    {
+                        context.FoodItems.Add(item);
+                    }
+                }
+                context.SaveChanges();
             }
-            context.SaveChanges();
         }
     }
 }

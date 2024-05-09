@@ -19,35 +19,6 @@ namespace NutriGendaApi.Migrations
                 .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("HealthProfile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Height")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("HealthProfiles");
-                });
-
             modelBuilder.Entity("NutriGendaApi.Source.Models.Diet", b =>
                 {
                     b.Property<Guid>("Id")
@@ -166,17 +137,6 @@ namespace NutriGendaApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("HealthProfile", b =>
-                {
-                    b.HasOne("User", "User")
-                        .WithOne("HealthProfile")
-                        .HasForeignKey("HealthProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("NutriGendaApi.Source.Models.Diet", b =>
                 {
                     b.HasOne("Nutritionist", null)
@@ -243,9 +203,6 @@ namespace NutriGendaApi.Migrations
             modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("Diets");
-
-                    b.Navigation("HealthProfile")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

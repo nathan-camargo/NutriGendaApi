@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NutriGendaApi.Source.Data;
-using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.DTOs.User;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,14 +19,14 @@ namespace NutriGendaApi.Source.Services
             _context = context;
             _mapper = mapper;
         }
-        public async Task<UserDTO?> Authenticate(string email, string password)
+        public async Task<UserLoginDTO?> Authenticate(string email, string password)
         {
             var user = await _context.Users
                                              .SingleOrDefaultAsync(n => n.Email == email);
 
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                return _mapper.Map<UserDTO>(user);
+                return _mapper.Map<UserLoginDTO>(user);
             }
 
             return null;
@@ -36,14 +36,14 @@ namespace NutriGendaApi.Source.Services
         /// </summary>
         /// <param name="userDto">DTO do usuário a ser criado.</param>
         /// <returns>DTO do usuário criado com ID.</returns>
-        public async Task<UserDTO> CreateUser(UserDTO userDto)
+        public async Task<UserRegisterDTO> CreateUser(UserRegisterDTO userDto)
         {
             var user = _mapper.Map<User>(userDto);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return _mapper.Map<UserDTO>(user);
+            return _mapper.Map<UserRegisterDTO>(user);
         }
 
         /// <summary>
@@ -51,14 +51,13 @@ namespace NutriGendaApi.Source.Services
         /// </summary>
         /// <param name="id">ID do usuário.</param>
         /// <returns>DTO do usuário encontrado ou null se não existir.</returns>
-        public async Task<UserDTO> GetUserById(Guid id)
+        public async Task<UserRegisterDTO> GetUserById(Guid id)
         {
             var user = await _context.Users
                                      .Include(u => u.Nutritionist)
-                                     .Include(u => u.HealthProfile)
                                      .Include(u => u.Diets)
                                      .FirstOrDefaultAsync(u => u.Id == id);
-            return _mapper.Map<UserDTO>(user);
+            return _mapper.Map<UserRegisterDTO>(user);
         }
 
         /// <summary>
@@ -66,7 +65,7 @@ namespace NutriGendaApi.Source.Services
         /// </summary>
         /// <param name="userDto">DTO do usuário com dados atualizados.</param>
         /// <returns>DTO do usuário atualizado.</returns>
-        public async Task<UserDTO> UpdateUser(UserDTO userDto)
+        public async Task<UserRegisterDTO> UpdateUser(UserRegisterDTO userDto)
         {
             var user = await _context.Users.FindAsync(userDto.Id);
             if (user == null)
@@ -76,7 +75,7 @@ namespace NutriGendaApi.Source.Services
             _mapper.Map(userDto, user);
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return _mapper.Map<UserDTO>(user);
+            return _mapper.Map<UserRegisterDTO>(user);
         }
 
         /// <summary>
@@ -101,31 +100,29 @@ namespace NutriGendaApi.Source.Services
         /// </summary>
         /// <param name="email">Email do usuário a ser encontrado.</param>
         /// <returns>DTO do usuário encontrado ou null se não existir.</returns>
-        public async Task<UserDTO> GetUserByEmail(string email)
+        public async Task<UserRegisterDTO> GetUserByEmail(string email)
         {
             var user = await _context.Users
                                      .Include(u => u.Nutritionist)
-                                     .Include(u => u.HealthProfile)
                                      .Include(u => u.Diets)
                                      .FirstOrDefaultAsync(u => u.Email == email);
-            return _mapper.Map<UserDTO>(user);
+            return _mapper.Map<UserRegisterDTO>(user);
         }
 
         /// <summary>
         /// Lista todos os usuários registrados.
         /// </summary>
         /// <returns>Lista de DTOs de todos os usuários.</returns>
-        public async Task<List<UserDTO>> GetAllUsers()
+        public async Task<List<UserRegisterDTO>> GetAllUsers()
         {
             var users = await _context.Users
                                       .Include(u => u.Nutritionist)
-                                      .Include(u => u.HealthProfile)
                                       .Include(u => u.Diets)
                                       .ToListAsync();
-            return _mapper.Map<List<UserDTO>>(users);
+            return _mapper.Map<List<UserRegisterDTO>>(users);
         }
 
-        public string GenerateJwtToken(UserDTO user)
+        public string GenerateJwtToken(UserLoginDTO user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ZGYLlJHrJJOJ8kKwr934PuTngXFyQFUsqbaPDGDbKrI"));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

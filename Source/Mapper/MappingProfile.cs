@@ -2,6 +2,7 @@
 using NutriGendaApi.Source.DTOs;
 using NutriGendaApi.Source.DTOs.Diet;
 using NutriGendaApi.Source.DTOs.Nutritionist;
+using NutriGendaApi.Source.DTOs.User;
 using NutriGendaApi.Source.Models;
 
 namespace NutriGendaApi.Source.Mapper
@@ -13,14 +14,9 @@ namespace NutriGendaApi.Source.Mapper
             // Mapeamentos para Diet
             CreateMap<Diet, DietDTO>()
                 .ReverseMap();
-
             CreateMap<Meal, MealDTO>() 
                 .ReverseMap();
             CreateMap<FoodItem, FoodItemDTO>()
-                .ReverseMap();
-
-            // Mapeamentos para HealthProfile
-            CreateMap<HealthProfile, HealthProfileDTO>()
                 .ReverseMap();
 
             // Mapeamentos para Nutritionist
@@ -31,7 +27,10 @@ namespace NutriGendaApi.Source.Mapper
                 .ReverseMap();
             
             // Mapeamentos para User
-            CreateMap<User, UserDTO>()
+            CreateMap<User, UserRegisterDTO>()
+                .ReverseMap();
+
+            CreateMap<User, UserLoginDTO>()
                 .ReverseMap();
         }
     }

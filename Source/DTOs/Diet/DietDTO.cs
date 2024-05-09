@@ -1,10 +1,12 @@
-﻿namespace NutriGendaApi.Source.DTOs.Diet
+﻿using NutriGendaApi.Source.Models;
+
+namespace NutriGendaApi.Source.DTOs.Diet
 {
     public class DietDTO
     {
         public Guid Id { get; set; }
-
         public Guid UserId { get; set; }
+        public virtual ICollection<MealDTO> Meals { get; set; } = new List<MealDTO>();
     }
 
     public class MealDTO
