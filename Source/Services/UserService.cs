@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace NutriGendaApi.Source.Services
 {
@@ -18,7 +19,18 @@ namespace NutriGendaApi.Source.Services
             _context = context;
             _mapper = mapper;
         }
+        public async Task<UserDTO?> Authenticate(string email, string password)
+        {
+            var user = await _context.Users
+                                             .SingleOrDefaultAsync(n => n.Email == email);
 
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                return _mapper.Map<UserDTO>(user);
+            }
+
+            return null;
+        }
         /// <summary>
         /// Cria um novo usuário.
         /// </summary>
@@ -27,6 +39,8 @@ namespace NutriGendaApi.Source.Services
         public async Task<UserDTO> CreateUser(UserDTO userDto)
         {
             var user = _mapper.Map<User>(userDto);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return _mapper.Map<UserDTO>(user);
@@ -109,6 +123,26 @@ namespace NutriGendaApi.Source.Services
                                       .Include(u => u.Diets)
                                       .ToListAsync();
             return _mapper.Map<List<UserDTO>>(users);
+        }
+
+        public string GenerateJwtToken(UserDTO user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ZGYLlJHrJJOJ8kKwr934PuTngXFyQFUsqbaPDGDbKrI"));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("Id", user.Id.ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddHours(3),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

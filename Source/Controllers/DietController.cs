@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.DTOs.Diet;
 using NutriGendaApi.Source.Services;
-using System;
-using System.Threading.Tasks;
 
 namespace NutriGendaApi.Source.Controllers
 {
@@ -99,6 +97,52 @@ namespace NutriGendaApi.Source.Controllers
         {
             var diets = await _dietService.GetDietsByUserId(userId);
             return Ok(diets);
+        }
+    }
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class MealController : ControllerBase
+    {
+        private readonly MealService _mealService;
+
+        public MealController(MealService mealService)
+        {
+            _mealService = mealService;
+        }
+
+        [HttpGet("{mealId}")]
+        public async Task<IActionResult> GetMealById(Guid mealId)
+        {
+            var meal = await _mealService.GetMealById(mealId);
+            if (meal == null) return NotFound();
+            return Ok(meal);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMeal([FromBody] MealDTO mealDto)
+        {
+            var createdMeal = await _mealService.CreateMeal(mealDto);
+            return CreatedAtAction(nameof(GetMealById), new { mealId = createdMeal.Id }, createdMeal);
+        }
+
+        [HttpPut("{mealId}")]
+        public async Task<IActionResult> UpdateMeal(Guid mealId, [FromBody] MealDTO mealDto)
+        {
+            if (mealId != mealDto.Id)
+                return BadRequest("ID mismatch");
+
+            var updatedMeal = await _mealService.UpdateMeal(mealId, mealDto);
+            if (updatedMeal == null) return NotFound();
+            return NoContent();
+        }
+
+        [HttpDelete("{mealId}")]
+        public async Task<IActionResult> DeleteMeal(Guid mealId)
+        {
+            bool success = await _mealService.DeleteMeal(mealId);
+            if (!success) return NotFound();
+            return NoContent();
         }
     }
 }

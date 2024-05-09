@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NutriGendaApi;
 using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.Services;
 using System.Text;
@@ -12,6 +13,8 @@ builder.Services.AddScoped<DietService>();
 builder.Services.AddScoped<HealthProfileService>();
 builder.Services.AddScoped<NutritionistService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<MealService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -23,9 +26,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            ValidateLifetime = true, 
-            ValidateIssuer = false, 
-            ValidateAudience = false 
+            ValidateLifetime = true,
+            ValidateIssuer = false,
+            ValidateAudience = false
         };
     });
 
@@ -46,5 +49,13 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<AppDbContext>();
+    DbInitializer.Initialize(context);
+}
 
 app.Run();

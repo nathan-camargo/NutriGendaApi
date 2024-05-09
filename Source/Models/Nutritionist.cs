@@ -1,3 +1,4 @@
+using NutriGendaApi.Source.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,7 +16,7 @@ public class Nutritionist
     [Column(TypeName = "varchar(255)")]
     public string Email { get; set; }
 
-    [Column(TypeName = "varchar(255)")]
+    [NotMapped]
     public string Password { get; set; }
 
     [Column(TypeName = "varchar(255)")]
@@ -23,4 +24,6 @@ public class Nutritionist
 
     [Column(TypeName = "varchar(255)")]
     public string Crn { get; set; }
+
+    public ICollection<Diet> Diets { get; set; } = new List<Diet>();
 }

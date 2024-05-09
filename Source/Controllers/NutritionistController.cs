@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.DTOs.Nutritionist;
 using NutriGendaApi.Source.Services;
 
 
@@ -17,13 +17,13 @@ namespace NutriGendaApi.Source.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] NutritionistDTO nutritionistDto)
+        public async Task<IActionResult> Login([FromBody] NutritionistLoginDTO nutritionistLoginDto)
         {
-            var user = await _nutritionistService.Authenticate(nutritionistDto.Email, nutritionistDto.Password);
+            var user = await _nutritionistService.Authenticate(nutritionistLoginDto.Email, nutritionistLoginDto.Password);
             if (user != null)
             {
                 var token = _nutritionistService.GenerateJwtToken(user);
-                return Ok(new { token = token });
+                return Ok(new { token });
             }
             else
             {
@@ -62,7 +62,7 @@ namespace NutriGendaApi.Source.Controllers
         /// <param name="nutritionistDto">DTO do nutricionista a ser criado.</param>
         /// <returns>O DTO do nutricionista criado.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateNutritionist([FromBody] NutritionistDTO nutritionistDto)
+        public async Task<IActionResult> CreateNutritionist([FromBody] NutritionistRegisterDTO nutritionistDto)
         {
             var createdNutritionist = await _nutritionistService.CreateNutritionist(nutritionistDto);
             return CreatedAtAction(nameof(GetNutritionistById), new { id = createdNutritionist.Id }, createdNutritionist);
@@ -75,7 +75,7 @@ namespace NutriGendaApi.Source.Controllers
         /// <param name="nutritionistDto">DTO com dados atualizados do nutricionista.</param>
         /// <returns>NoContent se a atualização for bem-sucedida, NotFound se não encontrado.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNutritionist(Guid id, [FromBody] NutritionistDTO nutritionistDto)
+        public async Task<IActionResult> UpdateNutritionist(Guid id, [FromBody] NutritionistRegisterDTO nutritionistDto)
         {
             if (id != nutritionistDto.Id)
                 return BadRequest("ID mismatch");

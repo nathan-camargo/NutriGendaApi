@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.DTOs;
+using NutriGendaApi.Source.DTOs.Nutritionist;
 using NutriGendaApi.Source.Services;
 
 
@@ -10,10 +12,28 @@ namespace NutriGendaApi.Source.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly AppDbContext _context;
 
-        public UserController(UserService userService)
+
+        public UserController(UserService userService, AppDbContext context)
         {
             _userService = userService;
+            _context = context;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserDTO userDto)
+        {
+            var user = await _userService.Authenticate(userDto.Email, userDto.Password);
+            if (user != null)
+            {
+                var token = _userService.GenerateJwtToken(user);
+                return Ok(new { token });
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         /// <summary>
@@ -49,6 +69,11 @@ namespace NutriGendaApi.Source.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] UserDTO userDto)
         {
+            if (userDto.NutritionistId == Guid.Empty || !_context.Nutritionists.Any(n => n.Id == userDto.NutritionistId))
+            {
+                return BadRequest("Invalid Nutritionist ID");
+            }
+
             var createdUser = await _userService.CreateUser(userDto);
             return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
         }
@@ -86,20 +111,6 @@ namespace NutriGendaApi.Source.Controllers
                 return NotFound();
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Busca um usuário pelo email.
-        /// </summary>
-        /// <param name="email">Email do usuário a ser encontrado.</param>
-        /// <returns>O DTO do usuário encontrado ou NotFound se não existir.</returns>
-        [HttpGet("byemail/{email}")]
-        public async Task<IActionResult> GetUserByEmail(string email)
-        {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null)
-                return NotFound();
-            return Ok(user);
         }
     }
 }
