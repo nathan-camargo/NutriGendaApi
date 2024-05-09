@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<DietService>();
-builder.Services.AddScoped<HealthProfileService>();
 builder.Services.AddScoped<NutritionistService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MealService>();

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NutriGendaApi.Source.Data;
-using NutriGendaApi.Source.DTOs;
-using NutriGendaApi.Source.DTOs.Nutritionist;
+using NutriGendaApi.Source.DTOs.User;
 using NutriGendaApi.Source.Services;
 
 
@@ -22,7 +21,7 @@ namespace NutriGendaApi.Source.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserDTO userDto)
+        public async Task<IActionResult> Login([FromBody] UserLoginDTO userDto)
         {
             var user = await _userService.Authenticate(userDto.Email, userDto.Password);
             if (user != null)
@@ -67,7 +66,7 @@ namespace NutriGendaApi.Source.Controllers
         /// <param name="userDto">DTO do usuário a ser criado.</param>
         /// <returns>O DTO do usuário criado.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] UserDTO userDto)
+        public async Task<IActionResult> CreateUser([FromBody] UserRegisterDTO userDto)
         {
             if (userDto.NutritionistId == Guid.Empty || !_context.Nutritionists.Any(n => n.Id == userDto.NutritionistId))
             {
@@ -85,7 +84,7 @@ namespace NutriGendaApi.Source.Controllers
         /// <param name="userDto">DTO com dados atualizados do usuário.</param>
         /// <returns>NoContent se a atualização for bem-sucedida, NotFound se não encontrado.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDTO userDto)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRegisterDTO userDto)
         {
             if (id != userDto.Id)
                 return BadRequest("ID mismatch");

@@ -6,7 +6,6 @@ namespace NutriGendaApi.Source.Data
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public DbSet<HealthProfile> HealthProfiles { get; set; }
         public DbSet<Diet> Diets { get; set; }
         public DbSet<Nutritionist> Nutritionists { get; set; }
         public DbSet<Meal> Meals { get; set; }
@@ -22,13 +21,6 @@ namespace NutriGendaApi.Source.Data
                 .WithMany()
                 .HasForeignKey(u => u.NutritionistId)
                 .HasPrincipalKey(n => n.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // HealthProfile to User Relationship
-            modelBuilder.Entity<HealthProfile>()
-                .HasOne(hp => hp.User)
-                .WithOne(u => u.HealthProfile)
-                .HasForeignKey<HealthProfile>(hp => hp.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Diet to User Relationship

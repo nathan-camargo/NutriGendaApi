@@ -77,29 +77,6 @@ namespace NutriGendaApi.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "HealthProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Age = table.Column<int>(type: "int", nullable: false),
-                    Height = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Comments = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HealthProfiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HealthProfiles_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Meals",
                 columns: table => new
                 {
@@ -156,12 +133,6 @@ namespace NutriGendaApi.Migrations
                 column: "MealId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HealthProfiles_UserId",
-                table: "HealthProfiles",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Meals_DietId",
                 table: "Meals",
                 column: "DietId");
@@ -177,9 +148,6 @@ namespace NutriGendaApi.Migrations
         {
             migrationBuilder.DropTable(
                 name: "FoodItems");
-
-            migrationBuilder.DropTable(
-                name: "HealthProfiles");
 
             migrationBuilder.DropTable(
                 name: "Meals");
