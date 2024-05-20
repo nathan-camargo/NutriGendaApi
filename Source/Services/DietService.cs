@@ -20,7 +20,7 @@ namespace NutriGendaApi.Source.Services
         /// <summary>
         /// Adiciona uma nova dieta ao banco de dados.
         /// </summary>
-        /// <param name="diet">Objeto Diet contendo todas as informações necessárias.</param>
+        /// <param name="dietDto">Objeto DietDTO contendo todas as informações necessárias.</param>
         /// <returns>A dieta criada com seu ID após a inserção no banco de dados.</returns>
         public async Task<DietDTO> CreateDiet(DietDTO dietDto)
         {
@@ -35,24 +35,36 @@ namespace NutriGendaApi.Source.Services
         /// </summary>
         /// <param name="id">ID da dieta.</param>
         /// <returns>A dieta correspondente ou null se não encontrada.</returns>
-        public async Task<DietDTO> GetDietById(Guid id)
+        public async Task<DietDTO?> GetDietById(Guid id)
         {
-            var diet = await _context.Diets.FindAsync(id);
+            var diet = await _context.Diets
+                .Include(d => d.Meals)
+                    .ThenInclude(m => m.FoodItems)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (diet == null)
+                return null;
+
             return _mapper.Map<DietDTO>(diet);
         }
 
         /// <summary>
         /// Atualiza uma dieta existente com novos dados.
         /// </summary>
-        /// <param name="diet">Objeto Diet atualizado.</param>
+        /// <param name="dietDto">Objeto DietDTO atualizado.</param>
         /// <returns>A dieta atualizada.</returns>
-        public async Task<DietDTO> UpdateDiet(DietDTO dietDto)
+        public async Task<DietDTO?> UpdateDiet(DietDTO dietDto)
         {
-            var diet = await _context.Diets.FindAsync(dietDto.Id);
+            var diet = await _context.Diets
+                .Include(d => d.Meals)
+                    .ThenInclude(m => m.FoodItems)
+                .FirstOrDefaultAsync(d => d.Id == dietDto.Id);
+
             if (diet == null)
             {
                 return null;
             }
+
             _mapper.Map(dietDto, diet);
             _context.Entry(diet).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -82,7 +94,11 @@ namespace NutriGendaApi.Source.Services
         /// <returns>Lista de dietas.</returns>
         public async Task<List<DietDTO>> GetAllDiets()
         {
-            var diets = await _context.Diets.ToListAsync();
+            var diets = await _context.Diets
+                .Include(d => d.Meals)
+                    .ThenInclude(m => m.FoodItems)
+                .ToListAsync();
+
             return _mapper.Map<List<DietDTO>>(diets);
         }
 
@@ -93,7 +109,12 @@ namespace NutriGendaApi.Source.Services
         /// <returns>Lista de dietas pertencentes ao usuário.</returns>
         public async Task<List<DietDTO>> GetDietsByUserId(Guid userId)
         {
-            var diets = await _context.Diets.Where(d => d.UserId == userId).ToListAsync();
+            var diets = await _context.Diets
+                .Include(d => d.Meals)
+                    .ThenInclude(m => m.FoodItems)
+                .Where(d => d.UserId == userId)
+                .ToListAsync();
+
             return _mapper.Map<List<DietDTO>>(diets);
         }
     }

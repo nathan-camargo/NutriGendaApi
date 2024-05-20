@@ -27,7 +27,7 @@ namespace NutriGendaApi.Source.Controllers
             if (user != null)
             {
                 var token = _userService.GenerateJwtToken(user);
-                return Ok(new { token });
+                return Ok(new { token, userId = user.Id });
             }
             else
             {

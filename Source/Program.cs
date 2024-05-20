@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NutriGendaApi;
+using NutriGendaApi.Source;
 using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.Services;
 using System.Text;
@@ -36,7 +36,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configuração do middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -44,7 +43,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

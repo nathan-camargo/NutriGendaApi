@@ -1,7 +1,7 @@
 ﻿using NutriGendaApi.Source.Data;
 using NutriGendaApi.Source.Models;
 
-namespace NutriGendaApi
+namespace NutriGendaApi.Source
 {
     public static class DbInitializer
     {

@@ -40,9 +40,9 @@ namespace NutriGendaApi.Source.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string Name { get; set; } // Name of the food like "Egg", "Milk", etc.
+        public string Name { get; set; } 
 
-        public string Description { get; set; } // Description or quantity like "2 eggs", "200ml of milk"
+        public string Description { get; set; }
 
         [ForeignKey("Meal")]
         public Guid MealId { get; set; }
