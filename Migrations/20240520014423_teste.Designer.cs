@@ -11,7 +11,7 @@ using NutriGendaApi.Source.Data;
 namespace NutriGendaApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240509024209_teste")]
+    [Migration("20240520014423_teste")]
     partial class teste
     {
         /// <inheritdoc />
